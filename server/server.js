@@ -24,7 +24,15 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .catch(err => console.log(err));
 
 // Middleware
-app.use(cors());
+const cors = require('cors');
+
+// Allow requests from your frontend
+app.use(cors({
+  origin: 'https://loctrack-1-6rsu.onrender.com', // Your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // Schema to store family member locations
