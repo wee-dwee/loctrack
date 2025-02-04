@@ -2,7 +2,7 @@
     "name": "my-project",
     "version": "1.0.0",
     "scripts": {
-        "start": "node app.js",
+        "start": "node server/server.js",
         "heroku-postbuild": "npm run build --prefix client",
         "dev": "concurrently \"npm run server\" \"npm run client\"",
         "server": "npm run start --prefix server",
