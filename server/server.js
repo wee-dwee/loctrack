@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const app = express(); // Initialize 'app' before using it
 
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, '../client/build')));
@@ -12,7 +13,6 @@ app.get('*', (req, res) => {
 });
 
 // Create the express app
-const app = express();
 const port = 5002;
 
 // MongoDB connection URI
