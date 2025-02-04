@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "serve": "^14.2.4"
+  },
+  "scripts": {
+    "start": "node app.js"
+  }
+  
+}

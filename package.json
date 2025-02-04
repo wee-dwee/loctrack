@@ -1,0 +1,16 @@
+{
+    "name": "my-project",
+    "version": "1.0.0",
+    "scripts": {
+      "start": "node server/app.js",
+      "heroku-postbuild": "npm run build --prefix client",
+      "dev": "concurrently \"npm run server\" \"npm run client\"",
+      "server": "npm run start --prefix server",  
+      "client": "npm run start --prefix client"   
+    },
+    "dependencies": {},
+    "devDependencies": {
+      "concurrently": "^6.0.0"
+    }
+  }
+  
