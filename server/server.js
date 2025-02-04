@@ -24,7 +24,6 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .catch(err => console.log(err));
 
 // Middleware
-const cors = require('cors');
 
 // Allow requests from your frontend
 app.use(cors({
