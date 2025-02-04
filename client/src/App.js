@@ -21,7 +21,7 @@ const encodeData = (latitude, longitude) => {
 const sendLocationToServer = (latitude, longitude, memberName) => {
   const encodedLocation = encodeData(latitude, longitude);
 
-  axios.post('http://localhost:5002/api/location', {
+  axios.post('https://loctrack-gfhy.onrender.com/api/location', {
     name: memberName,
     location: encodedLocation  // Sending encoded coordinates
   })
@@ -63,7 +63,7 @@ function App() {
 
   // Fetch all users and their locations from the backend
   const fetchUsersLocations = () => {
-    axios.get('http://localhost:5002/api/locations')
+    axios.get('https://loctrack-gfhy.onrender.com/api/locations')
       .then((response) => {
         setUsersList(response.data);
       })
