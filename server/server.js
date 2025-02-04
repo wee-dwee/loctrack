@@ -71,13 +71,13 @@ app.get('/api/locations', async (req, res) => {
   }
 });
 
-// ✅ Serve frontend build files
-app.use(express.static(path.join(__dirname, '../client/build')));
+// // ✅ Serve frontend build files
+// app.use(express.static(path.join(__dirname, '../client/build')));
 
-// ✅ Serve React app for unknown routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-});
+// // ✅ Serve React app for unknown routes
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+// });
 
 // ✅ Start server
 app.listen(port, () => {
