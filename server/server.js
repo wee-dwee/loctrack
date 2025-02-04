@@ -5,7 +5,6 @@ const path = require('path');
 const app = express(); // Initialize 'app' before using it
 
 // Serve the static files from the React app
-app.use(express.static(path.join(__dirname, '../client/build')));
 
 // Any request that doesn't match an API route will be handled by React's index.html
 app.get('*', (req, res) => {
