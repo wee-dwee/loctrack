@@ -2,90 +2,84 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
-const app = express(); // Initialize 'app' before using it
 
-// Serve the static files from the React app
+const app = express();
+const port = process.env.PORT || 5002;  // Dynamic port for deployment
 
-// Any request that doesn't match an API route will be handled by React's index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-});
-
-// Create the express app
-const port = 5002;
-
-// MongoDB connection URI
-const mongoURI = 'mongodb+srv://dweejpandya:xA-iCNw3PKUTtw6@cluster0.prz5r.mongodb.net/';
-
-// Connect to MongoDB
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.log(err));
-
-// Middleware
-
-// Allow requests from your frontend
+// ✅ Enable CORS for frontend
 app.use(cors({
-  origin: 'https://loctrack-1-6rsu.onrender.com', // Your frontend URL
+  origin: 'https://loctrack-1-6rsu.onrender.com', // Update with your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
+app.use(express.json());  // ✅ JSON middleware
 
-// Schema to store family member locations
+// ✅ MongoDB Connection
+const mongoURI = 'mongodb+srv://dweejpandya:xA-iCNw3PKUTtw6@cluster0.prz5r.mongodb.net/';
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
+
+// ✅ Schema and Model for storing locations
 const locationSchema = new mongoose.Schema({
   name: { type: String, unique: true },
   latitude: Number,
   longitude: Number,
   timestamp: { type: Date, default: Date.now }
 });
-
 const Location = mongoose.model('Location', locationSchema);
 
-// Function to decode Base64-encoded data
+// ✅ Decode Base64 location data
 const decodeData = (encodedData) => {
-  const decodedData = Buffer.from(encodedData, 'base64').toString();  // Decode Base64
-  const [latitude, longitude] = decodedData.split(',');
-  return { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
+  try {
+    const decodedData = Buffer.from(encodedData, 'base64').toString();
+    const [latitude, longitude] = decodedData.split(',');
+    return { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
+  } catch (error) {
+    return null;
+  }
 };
 
-// Endpoint to receive location updates
+// ✅ API to receive location updates
 app.post('/api/location', async (req, res) => {
   const { name, location } = req.body;
+  if (!name || !location) return res.status(400).json({ error: 'Missing location data' });
 
-  if (!name || !location) {
-    return res.status(400).send('Missing location data');
-  }
-
-  // Convert the name to uppercase
-  const upperCaseName = name.toUpperCase();
-
-  // Decode the location data
-  const { latitude, longitude } = decodeData(location);
+  const decodedLocation = decodeData(location);
+  if (!decodedLocation) return res.status(400).json({ error: 'Invalid location format' });
 
   try {
-    // Use findOneAndUpdate with upsert: true to avoid duplicate entries
     const updatedLocation = await Location.findOneAndUpdate(
-      { name: upperCaseName },  // Find by uppercase name
-      { latitude, longitude, timestamp: new Date() }, // Update the location
-      { upsert: true, new: true } // If not found, create a new entry
+      { name: name.toUpperCase() },
+      { ...decodedLocation, timestamp: new Date() },
+      { upsert: true, new: true }
     );
-
-    res.status(200).send('Location updated');
+    res.status(200).json({ message: 'Location updated', updatedLocation });
   } catch (err) {
-    res.status(500).send('Error saving location');
+    res.status(500).json({ error: 'Error saving location' });
   }
 });
 
-// Endpoint to get the latest location of all family members
-app.get('/api/locations', (req, res) => {
-  Location.find().sort({ timestamp: -1 }) // Sort by timestamp to get the most recent locations
-    .then(locations => res.json(locations))
-    .catch(err => res.status(500).send('Error retrieving locations'));
+// ✅ API to get latest locations
+app.get('/api/locations', async (req, res) => {
+  try {
+    const locations = await Location.find().sort({ timestamp: -1 });
+    res.json(locations);
+  } catch (err) {
+    res.status(500).json({ error: 'Error retrieving locations' });
+  }
 });
 
-// Start the server
+// ✅ Serve frontend build files
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+// ✅ Serve React app for unknown routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
+
+// ✅ Start server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`🚀 Server running at http://localhost:${port}`);
 });
